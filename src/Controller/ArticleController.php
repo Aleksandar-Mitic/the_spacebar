@@ -10,20 +10,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ArticleController extends AbstractController
 {
     /**
-     * @Route("/")
+     * @Route("/", name="indexAction")
      * @Template()
      */
     public function indexAction()
     {
         // return new Response('Da');
-        return $this->render('article/show.html.twig',
+        return $this->render('base.html.twig',
                 [
                     'title' => 'Tile yeaaaah',
                 ]);
     }
 
     /**
-     * @Route("/{slug}")
+     * @Route("/{slug}", name="show")
      * @Template()
      */
     public function show($slug)
@@ -33,6 +33,7 @@ class ArticleController extends AbstractController
             'Woohoo! I\'m going on an all-asteroid diet!',
             'I like bacon too! Buy some from my site! bakinsomebacon.com',
         ];
+
         return $this->render('article/show.html.twig', [
             'comments' => $comments,
             'title' => $slug,
