@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\MarkdownHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,8 +28,15 @@ class ArticleController extends AbstractController
      * @Route("/news/{slug}", name="article_show")
      * @Template()
      */
-    public function show($slug)
+    public function show($slug, MarkdownHelper $markdownHelper)
     {
+
+        $articleContent = <<<EOF
+
+        testo ! Lorem ipsum dolor sit amet, consectetur adipisicing elit. Non beatae maxime iste, inventore repudiandae distinctio neque similique eius obcaecati consequuntur, natus dignissimos quis ab! Quae sit tenetur impedit minima ipsum.
+EOF;
+
+        $articleContent = $markdownHelper->parse($articleContent);
 
         $comments = [
             'I ate a normal rock once. It did NOT taste like bacon!',
@@ -39,6 +47,7 @@ class ArticleController extends AbstractController
         return $this->render('article/show.html.twig', [
             'comments' => $comments,
             'slug' => $slug,
+            'content' => $articleContent,
             'title' => ucwords(str_replace('-', ' ', $slug)),
         ]);
     }
