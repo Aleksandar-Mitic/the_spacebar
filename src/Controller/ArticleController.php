@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Psr\Log\LoggerInterface;
 use App\Service\MarkdownHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -11,6 +12,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ArticleController extends AbstractController
 {
+    private $isDebug;
+
+    public function __construct($isDebug)
+    {
+        $this->isDebug = $isDebug;
+    }
+
     /**
      * @Route("/", name="homepage")
      * @Template()
@@ -28,12 +36,12 @@ class ArticleController extends AbstractController
      * @Route("/news/{slug}", name="article_show")
      * @Template()
      */
-    public function show($slug, MarkdownHelper $markdownHelper)
+    public function show($slug, MarkdownHelper $markdownHelper, $isDebug)
     {
 
         $articleContent = <<<EOF
 
-        testo ! Lorem ipsum dolor sit amet, consectetur adipisicing elit. Non beatae maxime iste, inventore repudiandae distinctio neque similique eius obcaecati consequuntur, natus dignissimos quis ab! Quae sit tenetur impedit minima ipsum.
+        Bacon ! Lorem ipsum dolor sit amet, consectetur adipisicing elit. Non beatae maxime iste, inventore repudiandae distinctio neque similique eius obcaecati consequuntur, natus dignissimos quis ab! Quae sit tenetur impedit minima ipsum.
 EOF;
 
         $articleContent = $markdownHelper->parse($articleContent);
