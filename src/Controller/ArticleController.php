@@ -2,8 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Article;
 use Psr\Log\LoggerInterface;
-use App\Service\MarkdownHelper;
+use App\Repository\ArticleRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,12 +24,14 @@ class ArticleController extends AbstractController
      * @Route("/", name="homepage")
      * @Template()
      */
-    public function homepage()
+    public function homepage(ArticleRepository $repository)
     {
-        // return new Response('Da');
+
+        $articles = $repository->findAllPublishedOrderedByNewest();
+
         return $this->render('article/homepage.html.twig',
                 [
-                    'title' => 'Tile yeaaaah',
+                    'articles' => $articles,
                 ]);
     }
 
@@ -36,15 +39,14 @@ class ArticleController extends AbstractController
      * @Route("/news/{slug}", name="article_show")
      * @Template()
      */
-    public function show($slug, MarkdownHelper $markdownHelper, $isDebug)
+    public function show(Article $article, ArticleRepository $repository, $slug)
     {
 
-        $articleContent = <<<EOF
+        $article = $repository->findOneBy(['slug' => $slug]);
 
-        Bacon ! Lorem ipsum dolor sit amet, consectetur adipisicing elit. Non beatae maxime iste, inventore repudiandae distinctio neque similique eius obcaecati consequuntur, natus dignissimos quis ab! Quae sit tenetur impedit minima ipsum.
-EOF;
-
-        $articleContent = $markdownHelper->parse($articleContent);
+        if (!$article) {
+            throw $this->createNotFoundException(sprintf('No article for slug "%s"', $slug));
+        }
 
         $comments = [
             'I ate a normal rock once. It did NOT taste like bacon!',
@@ -53,10 +55,8 @@ EOF;
         ];
 
         return $this->render('article/show.html.twig', [
+            'article' => $article,
             'comments' => $comments,
-            'slug' => $slug,
-            'content' => $articleContent,
-            'title' => ucwords(str_replace('-', ' ', $slug)),
         ]);
     }
 
