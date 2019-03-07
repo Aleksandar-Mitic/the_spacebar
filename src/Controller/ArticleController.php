@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Article;
 use Psr\Log\LoggerInterface;
 use App\Repository\ArticleRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -55,7 +56,7 @@ class ArticleController extends AbstractController
         ];
 
         return $this->render('article/show.html.twig', [
-            'article' => $article,
+            'article'  => $article,
             'comments' => $comments,
         ]);
     }
@@ -63,11 +64,12 @@ class ArticleController extends AbstractController
     /**
      * @Route("/news/{slug}/heart", name="article_toggle_heart", methods={"POST"} )
      */
-    public function toggleArticleHeart($slug)
+    public function toggleArticleHeart(Article $article, EntityManagerInterface $em)
     {
-        // TODO - actually heart/unheart the article!
+        $article->incrementHeartCount();
+        $em->flush();
 
-        return new JsonResponse(['hearts' => rand(5, 100)]);
+        return new JsonResponse(['hearts' => $article->getHeartCount()]);
     }
 
 
